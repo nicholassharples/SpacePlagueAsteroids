@@ -1,0 +1,57 @@
+Participants in this activity will track the impact sites of asteroids raining down on Deptford. This tasks gets harder as equipment malfunctions, and we have to use more advanced mathematical ideas to keep tracking the points.
+
+In doing so participants will explore geometric shapes produced by known distances (circles, and hyperbolas), the speed of sound, and discovering an object's position from distance and time measurements.
+
+Optionally, participants will be left with an appreciation of the mathematics behind the global position system (GPS) and that role that the Special Theory of Relativity has in this system.
+
+Participants will leave this activity with a map of impact sites - they will be able to compare with a map of disease outbreaks at a later activity.
+
+The activity requires a space of at least 5m*5m, 6 tape measures, a laminated 5m*5m map of Deptford, 3 digital displays, and an uplink to the Internation Space Station (or prerecorded video, whichever is cheaper).
+
+
+Set-up:
+The map is positioned on the floor, with the three tape measures fixed at particular points - "Deptford's Asteroid Listening Stations" (DALS). Dry-wipe pens are available for drawing on the map.
+
+
+The activity
+Round 1:
+The ISS reports and incoming asteroid tracks its impact to impact site 1, and reports the coordinates. We then look up the coordinates on the map.
+The DALS stations heard the impact, and report the distance from each station to the impact sites.
+Participants use the tape measures to verify these distances are correct.
+
+Round 2:
+The ISS link has broken!
+But the DALS stations are still operating perfectly. They report three distances:
+ * DALS1 to impact site
+ * DALS2 to impact site
+ * DALS3 to impact site
+If we draw a circle around each DALS station of the appropriate distance we can see where they intersect - this gives the impact site!
+
+Round 3:
+The DALS distance conversion units are broken!
+Instead the DALS stations report the time in seconds from the impact to when they heard it. We convert these into distances using the speed of sound (343 m/s), then draw circles again as in Round 2.
+
+Round 4:
+The DALS differential time cognition algorithm has broken!
+Instead the DALS report the (absolute, Greenwich Mean) time that they heard an impact.
+(This is the actual, realistic scenario).
+We look at the *differences* between these times: for example we see that
+ * DALS1 heard the impact 1 second before DALS2
+ * DALS2 heard the impact 2 seconds before DALS3
+ * DALS3 heard the impact 1 second before DALS1
+We then convert these to meters using the speed of sound.
+So we know that the impact site is
+ * 343m closer to DALS1 than DALS2
+ * 686m closer to DALS2 than DALS3
+ * 343m closer to DALS3 than DALS1
+We then plot these loci with the tape measures working in pairs (more tape measures is useful here) - find a point which is 400m away from DALS1 but 400-343 = 57m away from DALS2
+- repeat for 450m etc.
+This will draw a hyperbola.
+One we have three hyperbola then we know the position of the final impact site.
+
+
+Relationship to GPS:
+Round 4 is essentially how GPS works, except there is an added complication that the clocks on the satellites are *not* synchronised due to relativistic effects. A fourth listening station is then required to compensate for this.
+
+
+

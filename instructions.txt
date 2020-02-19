@@ -1,0 +1,65 @@
+Asteroid2.py
+An asteroid impact simulator written for SmashFest 2020
+Requirements:
+	Python3
+	Numpy
+	Pygame
+	smallmap.png - a 768x768 image file of a map
+
+Controls:
+	spacebar = release next asteroid
+	r = reset
+
+
+There are at total of 5 asteroid impacts.
+
+Instructions:
+To run the asteroid simulator double click on "asteroid2.py"
+
+Describe the set-up:
+	we have three "listening stations" around deptford that are detecting sound waves from asteroid impacts.
+	The ISS is tracking impacts - it is reporting the impact locations, our "listening stations" are detecting them.
+
+Wait for the first impact (press spacebar) - watch the soundwaves and see the listening stations react.
+	Find the site on the ground map - mark it with a pushpin.
+	Check the calibration of the listening stations - measure the distance to the pin - this should match the distances calculated from the software
+	
+Repeat three more times:
+	press spacebar
+	mark-up the impact site
+	there's no need to recheck calibration.
+	introduce the other data - in particular the "time delta" and "distance delta" - we will need these in a second!
+	
+After the fourth impact we will lose our connection to the ISS.
+	"ISS: uplink LOST" is displayed.
+
+Press spacebar to trigger another asteroid
+	We can't see it!
+	We don't know
+		the impact time
+		the time delay before each station detected it
+		the distance to each stations
+	We do know
+		the difference in detection times, so
+		how much closer the impact is to each station.
+		
+We need to find the impact site!
+	Using two tape measures, find all the points that are "x cm" closer to station 1 than station 2.
+	(e.g. choose a distance of 1m, find the intersection of a circle of radius (100 + x)cm and a circle of radius 100cm)
+	This should give a hyperbola
+	Repeat for the other pair of stations.
+	Find the interesection of these parabola.
+	Job done!
+
+
+To reset:
+	Press "r"
+
+To quit:
+	Press "q"
+
+	
+
+
+
+

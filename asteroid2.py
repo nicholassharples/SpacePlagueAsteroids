@@ -68,6 +68,14 @@ class game(object):
 		self.deltas = []
 		
 	def reset(self):
+		self.impacts = []
+		self.stations = []
+		self.ISStexts = []
+		self.ISSuplink = True
+		self.asteroidcount = 0
+		self.deltas = []
+		
+	
 		## Create stations
 		station(int(maprect.width/2), 20 , "red", (255,0,0), (255,255,0), maprect.width + 20, 150, "Red Tower: Listening")
 		station(20, maprect.height-20 , "green", (0,255,0), (0,255,255), maprect.width + 20, 250, "Green Tower: Listening")
@@ -212,19 +220,19 @@ while 1:
 				#del game ## ToDo: Fix removal.
 				#print("Game deleted")
 				#game = game()
-				#game.reset()
-				impact(random.randint(1,maprect.width), random.randint(1,maprect.height), game.ISSuplink)
-			if event.key == pygame.K_i:
-				if game.ISSuplink == True:
-					game.ISSloseuplink()
-				else:
-					game.ISSgetuplink()
+				game.reset()
+				#impact((random.randint(1,maprect.width), random.randint(1,maprect.height)), game.ISSuplink)
+			#if event.key == pygame.K_i: # toggle ISS for debugging
+			#	if game.ISSuplink == True:
+			#		game.ISSloseuplink()
+			#	else:
+			#		game.ISSgetuplink()
 	clock.tick(30)
 	drawMap()
 	if showFPS == True:
 		drawFPS()
 	
-	if game.asteroidcount == 4 and game.ISSuplink and all(game.impacts[3].detected): ## 4 impacts, still have uplink and all stations have detected it
+	if game.asteroidcount == 4 and game.ISSuplink and all(game.impacts[3].detected): ## 4 previous impacts, still have uplink and all stations have detected it
 		game.ISSloseuplink()
 	
 	## Update stations
@@ -274,8 +282,8 @@ while 1:
 							prettytimedelta = datetime.datetime.utcfromtimestamp(timedelta.total_seconds())
 							prettytimedelta = prettytimedelta.strftime("%S.") + prettytimedelta.strftime("%f")[:2]
 							game.deltas[0].textline1 = "time delta: {0} s".format(prettytimedelta)
-							game.deltas[0].textline2 = "distance delta: {0:.2f} m".format(timedelta.total_seconds()*speedofsound)
-							game.deltas[0].textline3 = "map distance delta: {0:.2f} cm".format(timedelta.total_seconds()*speedofsound*mapconversion)
+							game.deltas[0].textline2 = "distance delta: {0:.1f} m".format(timedelta.total_seconds()*speedofsound)
+							game.deltas[0].textline3 = "map distance delta: {0:.1f} cm".format(timedelta.total_seconds()*speedofsound*mapconversion)
 					
 					if j == 1:
 						if site.detected[0] == True:
@@ -283,16 +291,16 @@ while 1:
 							prettytimedelta = datetime.datetime.utcfromtimestamp(timedelta.total_seconds())
 							prettytimedelta = prettytimedelta.strftime("%S.") + prettytimedelta.strftime("%f")[:2]
 							game.deltas[0].textline1 = "time delta: {0} s".format(prettytimedelta)
-							game.deltas[0].textline2 = "distance delta: {0:.2f} m".format(timedelta.total_seconds()*speedofsound)
-							game.deltas[0].textline3 = "map distance delta: {0:.2f} cm".format(timedelta.total_seconds()*speedofsound*mapconversion)
+							game.deltas[0].textline2 = "distance delta: {0:.1f} m".format(timedelta.total_seconds()*speedofsound)
+							game.deltas[0].textline3 = "map distance delta: {0:.1f} cm".format(timedelta.total_seconds()*speedofsound*mapconversion)
 							
 						if site.detected[2] == True:
 							timedelta = game.stations[j].detectedtime - game.stations[2].detectedtime
 							prettytimedelta = datetime.datetime.utcfromtimestamp(timedelta.total_seconds())
 							prettytimedelta = prettytimedelta.strftime("%S.") + prettytimedelta.strftime("%f")[:2]
 							game.deltas[1].textline1 = "time delta: {0} s".format(prettytimedelta)
-							game.deltas[1].textline2 = "distance delta: {0:.2f} m".format(timedelta.total_seconds()*speedofsound)
-							game.deltas[1].textline3 = "map distance delta: {0:.2f} cm".format(timedelta.total_seconds()*speedofsound*mapconversion)
+							game.deltas[1].textline2 = "distance delta: {0:.1f} m".format(timedelta.total_seconds()*speedofsound)
+							game.deltas[1].textline3 = "map distance delta: {0:.1f} cm".format(timedelta.total_seconds()*speedofsound*mapconversion)
 					
 					if j == 2:
 						if site.detected[1] == True:
@@ -300,8 +308,8 @@ while 1:
 							prettytimedelta = datetime.datetime.utcfromtimestamp(timedelta.total_seconds())
 							prettytimedelta = prettytimedelta.strftime("%S.") + prettytimedelta.strftime("%f")[:2]
 							game.deltas[1].textline1 = "time delta: {0} s".format(prettytimedelta)
-							game.deltas[1].textline2 = "distance delta: {0:.2f} m".format(timedelta.total_seconds()*speedofsound)
-							game.deltas[1].textline3 = "map distance delta: {0:.2f} cm".format(timedelta.total_seconds()*speedofsound*mapconversion)
+							game.deltas[1].textline2 = "distance delta: {0:.1f} m".format(timedelta.total_seconds()*speedofsound)
+							game.deltas[1].textline3 = "map distance delta: {0:.1f} cm".format(timedelta.total_seconds()*speedofsound*mapconversion)
 		
 	
 	

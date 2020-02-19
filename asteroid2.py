@@ -202,6 +202,10 @@ class delta(object):
 		screen.blit(Font.render(self.textline2, True, self.colour), (self.textx+10, self.texty+20))
 		screen.blit(Font.render(self.textline3, True, self.colour), (self.textx+10, self.texty+40))
 	
+	#def drawhyperbola(self):
+	#	pixeldelta = self.timedelta*speed
+
+
 
 game = game()
 game.reset()
@@ -285,6 +289,7 @@ while 1:
 							game.deltas[0].textline1 = "time delta: {0} s".format(prettytimedelta)
 							game.deltas[0].textline2 = "distance delta: {0:.1f} m".format(timedelta.total_seconds()*speedofsound)
 							game.deltas[0].textline3 = "map distance delta: {0:.1f} cm".format(timedelta.total_seconds()*speedofsound*mapconversion)
+							game.deltas[0].timedelta = timedelta.total_seconds()
 					
 					if j == 1:
 						if site.detected[0] == True:
@@ -294,6 +299,7 @@ while 1:
 							game.deltas[0].textline1 = "time delta: {0} s".format(prettytimedelta)
 							game.deltas[0].textline2 = "distance delta: {0:.1f} m".format(timedelta.total_seconds()*speedofsound)
 							game.deltas[0].textline3 = "map distance delta: {0:.1f} cm".format(timedelta.total_seconds()*speedofsound*mapconversion)
+							game.deltas[0].timedelta = timedelta.total_seconds()
 							
 						if site.detected[2] == True:
 							timedelta = game.stations[j].detectedtime - game.stations[2].detectedtime
@@ -302,6 +308,7 @@ while 1:
 							game.deltas[1].textline1 = "time delta: {0} s".format(prettytimedelta)
 							game.deltas[1].textline2 = "distance delta: {0:.1f} m".format(timedelta.total_seconds()*speedofsound)
 							game.deltas[1].textline3 = "map distance delta: {0:.1f} cm".format(timedelta.total_seconds()*speedofsound*mapconversion)
+							game.deltas[1].timedelta = timedelta.total_seconds()
 					
 					if j == 2:
 						if site.detected[1] == True:
@@ -311,6 +318,7 @@ while 1:
 							game.deltas[1].textline1 = "time delta: {0} s".format(prettytimedelta)
 							game.deltas[1].textline2 = "distance delta: {0:.1f} m".format(timedelta.total_seconds()*speedofsound)
 							game.deltas[1].textline3 = "map distance delta: {0:.1f} cm".format(timedelta.total_seconds()*speedofsound*mapconversion)
+							game.deltas[1].timedelta = timedelta.total_seconds()
 		
 	
 	

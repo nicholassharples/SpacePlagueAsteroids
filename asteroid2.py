@@ -77,9 +77,9 @@ class game(object):
 		
 	
 		## Create stations
-		station(int(maprect.width/2), 20 , "red", (255,0,0), (255,255,0), maprect.width + 20, 150, "Red Tower: Listening")
-		station(20, maprect.height-20 , "green", (0,255,0), (0,255,255), maprect.width + 20, 250, "Green Tower: Listening")
-		station(maprect.width-20, maprect.height-20 , "blue", (0,0,255), (255,0,255), maprect.width + 20, 350, "Blue Tower: Listening")
+		station(450, 60 , "red", (200,25,25), (255,0,0), maprect.width + 20, 150, "Red Tower: Listening")
+		station(60, maprect.height-60 , "green", (25,200,25), (0,255,0), maprect.width + 20, 250, "Green Tower: Listening")
+		station(maprect.width-60, maprect.height-160 , "blue", (25,25,200), (0,0,255), maprect.width + 20, 350, "Blue Tower: Listening")
 
 		## Create text
 		ISStext(maprect.width + 40, 20, "ISS: uplink established...")
@@ -88,8 +88,8 @@ class game(object):
 		ISStext(maprect.width + 20, height - 40, "Mapping data copyright OpenStreetMap.org")
 		
 		## Create deltas
-		delta(maprect.width + 300, 230, (128,0,0) )
-		delta(maprect.width + 300, 330, (0,128,0) )
+		delta(maprect.width + 300, 230, (112,112,25) )
+		delta(maprect.width + 300, 330, (25,112,112) )
 		
 
 		## Draw
@@ -111,7 +111,7 @@ class ISStext(object):
 		self.x = x
 		self.y = y
 		self.text = text
-		self.colour = (28,118,48)
+		self.colour = (255,255,0) #(28,118,48)
 		game.ISStexts.append(self)
 	
 	def drawtext(self):

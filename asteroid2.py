@@ -11,12 +11,12 @@ pixeltodistance = 3.25
 speedofsound = 343
 ## Speed of sound = 343 m/s, so 105 pixels per second
 speed = 105 # shockwave speed in pixels per second
-distancetomap = 1  ## update once we see the maps!
+mapconversion = 0.01  ## Meters of world to cm of map. Update once we see the maps!
 
 
 clock = pygame.time.Clock()
 
-showFPS = True
+showFPS = False
 
 size = width, height = 1366,768
 
@@ -35,10 +35,13 @@ screen.fill(background)
 map = pygame.image.load("SmallMap.png")
 maprect = map.get_rect()
 
+### Asteroid list
+asteroids = [(252,328), (29,283), (376,251), (111,381), (413,474)] 
+
 
 def drawMap():
 	screen.blit(map,maprect)
-	for tower in stations:
+	for tower in game.stations:
 		tower.draw()
 
 def drawFPS():
@@ -47,52 +50,94 @@ def drawFPS():
 
 def drawConsole():
 	pygame.draw.rect(screen, background, (maprect.right, 0, width-maprect.width, height))
-	for tower in stations:
+	for tower in game.stations:
 		tower.drawtext()
 		tower.draw()
-	for text in ISStexts:
+	for text in game.ISStexts:
 		text.drawtext()
+	for deltainfo in game.deltas:
+		deltainfo.drawtext()
 
-impacts = []
-stations = []
-ISStexts = []
+class game(object):
+	def __init__(self):
+		self.impacts = []
+		self.stations = []
+		self.ISStexts = []
+		self.ISSuplink = True
+		self.asteroidcount = 0
+		self.deltas = []
+		
+	def reset(self):
+		## Create stations
+		station(int(maprect.width/2), 20 , "red", (255,0,0), (255,255,0), maprect.width + 20, 150, "Red Tower: Listening")
+		station(20, maprect.height-20 , "green", (0,255,0), (0,255,255), maprect.width + 20, 250, "Green Tower: Listening")
+		station(maprect.width-20, maprect.height-20 , "blue", (0,0,255), (255,0,255), maprect.width + 20, 350, "Blue Tower: Listening")
 
+		## Create text
+		ISStext(maprect.width + 40, 20, "ISS: uplink established...")
+		ISStext(maprect.width + 40, 40, "")
+		ISStext(maprect.width + 40, height - 200, "Total asteroids: {0}".format(self.asteroidcount))
+		ISStext(maprect.width + 20, height - 40, "Mapping data copyright OpenStreetMap.org")
+		
+		## Create deltas
+		delta(maprect.width + 300, 230, (128,0,0) )
+		delta(maprect.width + 300, 330, (0,128,0) )
+		
+
+		## Draw
+		drawMap()
+		pygame.display.flip()
+
+
+	def ISSloseuplink(self):
+		self.ISSuplink = False
+		self.ISStexts[0].text = "ISS: uplink LOST"
+		self.ISStexts[1].text = ""
+	
+	def ISSgetuplink(self):
+		self.ISSuplink = True
+		self.ISStexts[0].text = "ISS: uplink established..."
+		
 class ISStext(object):
 	def __init__(self,x,y,text):
 		self.x = x
 		self.y = y
 		self.text = text
 		self.colour = (28,118,48)
-		ISStexts.append(self)
+		game.ISStexts.append(self)
 	
 	def drawtext(self):
 		screen.blit(Font.render(self.text, True, self.colour), (self.x, self.y))
-
 	
 class impact(object):
-	def __init__(self,x,y,visible):
-		self.x = x
-		self.y = y
+	def __init__(self,coordinates,visible):
+		self.x = coordinates[0]
+		self.y = coordinates[1]
 		self.visible = visible
 		self.creationtime = pygame.time.get_ticks()
 		self.timetotower = []
-		for tower in stations:
+		for tower in game.stations:
 			distance = numpy.sqrt((self.x - tower.x)**2 + (self.y - tower.y)**2)
 			self.timetotower.append(distance/speed)
 		print(self.timetotower)
-		self.detected = numpy.repeat(False, len(stations))
+		self.detected = numpy.repeat(False, len(game.stations))
 		self.radius = 2
-		
-		impacts.append(self)
+		game.impacts.append(self)
+		if self.visible:
+			actualtime = datetime.datetime.now().strftime("%H:%M:%S.") + datetime.datetime.now().strftime("%f")[:2]
+			game.ISStexts[1].text = "Impact at {0}".format(actualtime) 
+		game.asteroidcount += 1
+		game.ISStexts[2].text = "Total asteroids: {0}".format(game.asteroidcount)
 	
 	def draw(self):
-		pygame.draw.circle(screen, (255,0,0), (self.x,self.y), 4,0)
-		if self.radius >= 2:
-			pygame.draw.circle(screen, (128,128,255), (self.x,self.y), self.radius, 2)
-		if self.radius > 11:
-			pygame.draw.circle(screen, (128,128,255), (self.x,self.y), self.radius-10, 2)
-		if self.radius > 22:
-			pygame.draw.circle(screen, (128,128,255), (self.x,self.y), self.radius-20, 2)
+		if self.visible:
+			pygame.draw.circle(screen, (255,0,0), (self.x,self.y), 4,0)
+			if self.radius >= 2:
+				pygame.draw.circle(screen, (128,128,255), (self.x,self.y), self.radius, 2)
+			if self.radius > 11:
+				pygame.draw.circle(screen, (128,128,255), (self.x,self.y), self.radius-10, 2)
+			if self.radius > 22:
+				pygame.draw.circle(screen, (128,128,255), (self.x,self.y), self.radius-20, 2)
 
 class station(object):
 	def __init__(self,x,y,name,colour,flashcolour,textx,texty,text):
@@ -103,18 +148,20 @@ class station(object):
 		self.textline1 = text
 		self.textline2 = ""
 		self.textline3 = ""
+		self.textline4 = ""
 		self.state = "Listening"
 		self.lasttriggered = pygame.time.get_ticks()
 		self.defaultcolour = colour
 		self.flashcolour = flashcolour
 		self.colour = colour
 		self.radius = 10
-		stations.append(self)
+		self.detectedtime = 0
+		game.stations.append(self)
 	
 	def draw(self):
 		pygame.draw.circle(screen, self.colour, (self.x,self.y), self.radius)
 		if self.state == "Triggered":
-			pygame.draw.aaline(screen, self.colour, (self.x,self.y), (self.textx, self.texty))
+			pygame.draw.aaline(screen, self.colour, (self.x,self.y), (self.textx-10, self.texty+50))
 
 	def trigger(self):
 		self.colour = self.flashcolour
@@ -130,21 +177,26 @@ class station(object):
 		screen.blit(Font.render(self.textline1, True, self.colour), (self.textx, self.texty))
 		screen.blit(Font.render(self.textline2, True, self.colour), (self.textx+10, self.texty+20))
 		screen.blit(Font.render(self.textline3, True, self.colour), (self.textx+10, self.texty+40))
+		screen.blit(Font.render(self.textline4, True, self.colour), (self.textx+10, self.texty+60))
 
+class delta(object):
+	def __init__(self, textx, texty, colour):
+		self.textx = textx
+		self.texty = texty
+		self.textline1 = ""
+		self.textline2 = ""
+		self.textline3 = ""
+		self.colour = colour
+		game.deltas.append(self)
 
-## Create stations
-station(int(maprect.width/2), 20 , "red", (255,0,0), (255,255,0), maprect.width + 100, 150, "Red Tower: Listening")
-station(20, maprect.height-20 , "green", (0,255,0), (0,255,255), maprect.width + 100, 250, "Green Tower: Listening")
-station(maprect.width-20, maprect.height-20 , "blue", (0,0,255), (255,0,255), maprect.width + 100, 350, "Blue Tower: Listening")
+	def drawtext(self):
+		screen.blit(Font.render(self.textline1, True, self.colour), (self.textx, self.texty))
+		screen.blit(Font.render(self.textline2, True, self.colour), (self.textx+10, self.texty+20))
+		screen.blit(Font.render(self.textline3, True, self.colour), (self.textx+10, self.texty+40))
+	
 
-## Create text
-ISStext(maprect.width + 40, 20, "ISS: uplink established...")
-ISStext(maprect.width + 40, 40, "")
-
-
-drawMap()
-
-pygame.display.flip()
+game = game()
+game.reset()
 
 while 1:
 	for event in pygame.event.get():
@@ -153,18 +205,30 @@ while 1:
 		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_q: sys.exit()
 			if event.key == pygame.K_SPACE:
-				impact(200,450, True)
-				actualtime = datetime.datetime.now().strftime("%H:%M:%S.") + datetime.datetime.now().strftime("%f")[:2]
-				ISStexts[1].text = "Impact at {0}".format(actualtime)
+				impact(asteroids[game.asteroidcount], game.ISSuplink) ## we can see the impact if the ISS uplink is established.
+				#actualtime = datetime.datetime.now().strftime("%H:%M:%S.") + datetime.datetime.now().strftime("%f")[:2]
+				#game.ISStexts[1].text = "Impact at {0}".format(actualtime)
 			if event.key == pygame.K_r:
-				impact(random.randint(1,maprect.width), random.randint(1,maprect.height), True)
+				#del game ## ToDo: Fix removal.
+				#print("Game deleted")
+				#game = game()
+				#game.reset()
+				impact(random.randint(1,maprect.width), random.randint(1,maprect.height), game.ISSuplink)
+			if event.key == pygame.K_i:
+				if game.ISSuplink == True:
+					game.ISSloseuplink()
+				else:
+					game.ISSgetuplink()
 	clock.tick(30)
 	drawMap()
 	if showFPS == True:
 		drawFPS()
 	
+	if game.asteroidcount == 4 and game.ISSuplink and all(game.impacts[3].detected): ## 4 impacts, still have uplink and all stations have detected it
+		game.ISSloseuplink()
+	
 	## Update stations
-	for tower in stations:
+	for tower in game.stations:
 		elapsedtime = pygame.time.get_ticks() - tower.lasttriggered
 		if tower.state == "Triggered":
 			tower.radius = int((1-elapsedtime/2000)*10 + 10)
@@ -174,7 +238,7 @@ while 1:
 	
 	
 	## Draw impact shockwaves
-	for site in impacts:
+	for site in game.impacts:
 		if site.visible == True:
 			site.draw()
 		#site.radius == int(site.clock.get_time())
@@ -184,17 +248,60 @@ while 1:
 	drawConsole()
 	
 	## Check for impacts
-	for site in impacts:
+	for site in game.impacts:
 		elapsedtime = pygame.time.get_ticks() - site.creationtime
-		for j in range(len(stations)):
+		for j in range(len(game.stations)):
 			if elapsedtime/1000 > site.timetotower[j]:
 				if site.detected[j] == False:
 					site.detected[j] = True
-					stations[j].trigger()
-					actualtime = datetime.datetime.now().strftime("%H:%M:%S.") + datetime.datetime.now().strftime("%f")[:2]
-					stations[j].textline1 = "Detected at {0}".format(actualtime) 
-					stations[j].textline2 = "Impact: +{0:.2f} seconds".format(elapsedtime/1000)
-					stations[j].textline3 = "Distance: {0:.2f} meters".format(elapsedtime/1000*speedofsound)
+					game.stations[j].trigger()
+					game.stations[j].detectedtime = datetime.datetime.now()
+					prettytime = datetime.datetime.now().strftime("%H:%M:%S.") + datetime.datetime.now().strftime("%f")[:2]
+					game.stations[j].textline1 = "Detected at {0}".format(prettytime) 
+					if game.ISSuplink:
+						game.stations[j].textline2 = "Impact: +{0:.2f} s".format(elapsedtime/1000)
+						game.stations[j].textline3 = "Distance: {0:.2f} m".format(elapsedtime/1000*speedofsound)
+						game.stations[j].textline4 = "Map distance: {0:.2f} cm".format(elapsedtime/1000*speedofsound*mapconversion)
+					if not game.ISSuplink:
+						game.stations[j].textline2 = "Impact: +Unknown"
+						game.stations[j].textline3 = "Distance: Unknown"
+						game.stations[j].textline4 = "Map distance: Unknown"
+
+					## Update time delta information
+					if j == 0:
+						if site.detected[1] == True:
+							timedelta = game.stations[j].detectedtime - game.stations[1].detectedtime
+							prettytimedelta = datetime.datetime.utcfromtimestamp(timedelta.total_seconds())
+							prettytimedelta = prettytimedelta.strftime("%S.") + prettytimedelta.strftime("%f")[:2]
+							game.deltas[0].textline1 = "time delta: {0} s".format(prettytimedelta)
+							game.deltas[0].textline2 = "distance delta: {0:.2f} m".format(timedelta.total_seconds()*speedofsound)
+							game.deltas[0].textline3 = "map distance delta: {0:.2f} cm".format(timedelta.total_seconds()*speedofsound*mapconversion)
+					
+					if j == 1:
+						if site.detected[0] == True:
+							timedelta = game.stations[j].detectedtime - game.stations[0].detectedtime
+							prettytimedelta = datetime.datetime.utcfromtimestamp(timedelta.total_seconds())
+							prettytimedelta = prettytimedelta.strftime("%S.") + prettytimedelta.strftime("%f")[:2]
+							game.deltas[0].textline1 = "time delta: {0} s".format(prettytimedelta)
+							game.deltas[0].textline2 = "distance delta: {0:.2f} m".format(timedelta.total_seconds()*speedofsound)
+							game.deltas[0].textline3 = "map distance delta: {0:.2f} cm".format(timedelta.total_seconds()*speedofsound*mapconversion)
+							
+						if site.detected[2] == True:
+							timedelta = game.stations[j].detectedtime - game.stations[2].detectedtime
+							prettytimedelta = datetime.datetime.utcfromtimestamp(timedelta.total_seconds())
+							prettytimedelta = prettytimedelta.strftime("%S.") + prettytimedelta.strftime("%f")[:2]
+							game.deltas[1].textline1 = "time delta: {0} s".format(prettytimedelta)
+							game.deltas[1].textline2 = "distance delta: {0:.2f} m".format(timedelta.total_seconds()*speedofsound)
+							game.deltas[1].textline3 = "map distance delta: {0:.2f} cm".format(timedelta.total_seconds()*speedofsound*mapconversion)
+					
+					if j == 2:
+						if site.detected[1] == True:
+							timedelta = game.stations[j].detectedtime - game.stations[1].detectedtime
+							prettytimedelta = datetime.datetime.utcfromtimestamp(timedelta.total_seconds())
+							prettytimedelta = prettytimedelta.strftime("%S.") + prettytimedelta.strftime("%f")[:2]
+							game.deltas[1].textline1 = "time delta: {0} s".format(prettytimedelta)
+							game.deltas[1].textline2 = "distance delta: {0:.2f} m".format(timedelta.total_seconds()*speedofsound)
+							game.deltas[1].textline3 = "map distance delta: {0:.2f} cm".format(timedelta.total_seconds()*speedofsound*mapconversion)
 		
 	
 	

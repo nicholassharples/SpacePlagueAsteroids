@@ -213,7 +213,8 @@ while 1:
 		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_q: sys.exit()
 			if event.key == pygame.K_SPACE:
-				impact(asteroids[game.asteroidcount], game.ISSuplink) ## we can see the impact if the ISS uplink is established.
+				if game.asteroidcount < 5:
+					impact(asteroids[game.asteroidcount], game.ISSuplink) ## we can see the impact if the ISS uplink is established.
 				#actualtime = datetime.datetime.now().strftime("%H:%M:%S.") + datetime.datetime.now().strftime("%f")[:2]
 				#game.ISStexts[1].text = "Impact at {0}".format(actualtime)
 			if event.key == pygame.K_r:

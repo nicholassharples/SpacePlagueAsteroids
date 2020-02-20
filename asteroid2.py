@@ -11,7 +11,7 @@ pixeltodistance = 3.25
 speedofsound = 343
 ## Speed of sound = 343 m/s, so 105 pixels per second
 speed = 105 # shockwave speed in pixels per second
-mapconversion = 0.01  ## Meters of world to cm of map. Update once we see the maps!
+mapconversion = 16/650*85/27  ## Meters of world to cm of map. Update once we see the maps!
 
 
 clock = pygame.time.Clock()
@@ -216,7 +216,7 @@ while 1:
 
 		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_q: sys.exit()
-			if event.key == pygame.K_SPACE:
+			if event.key == pygame.K_SPACE or event.key == pygame.K_PAGEDOWN:
 				if game.asteroidcount < 5:
 					impact(asteroids[game.asteroidcount], game.ISSuplink) ## we can see the impact if the ISS uplink is established.
 				#actualtime = datetime.datetime.now().strftime("%H:%M:%S.") + datetime.datetime.now().strftime("%f")[:2]
